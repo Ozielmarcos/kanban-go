@@ -1,0 +1,43 @@
+services:
+  app:
+    build: .
+    container_name: go_todolist_app
+    ports:
+      - "3005:3005"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=todolist
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_SECRET=mytodolistsecret
+    restart: always
+
+  db:
+    image: postgres:15
+    container_name: go_todolist_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: todolist
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./app/pkg/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+
+  redis:
+    image: redis:7
+    container_name: go_todolist_redis
+    ports:
+      - "6379:6379"
+    restart: always
+
+volumes:
+  postgres_data:
