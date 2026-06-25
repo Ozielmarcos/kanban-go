@@ -16,7 +16,7 @@ func main() {
 
 	r.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:3000", "http://localhost:5173"}, // Adicione as URLs do seu front aqui
-		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE"},
+		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "PATCH", "DELETE"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
@@ -34,6 +34,7 @@ func main() {
 	//Stories
 	auth.POST("/stories", handler.CreateStory)
 	auth.GET("/stories", handler.GetStoriesByUser)
+	auth.GET("/stories/:story_id/tasks", handler.GetTasksByStory)
 	auth.PUT("/story/:id", handler.UpdateStory)
 	auth.DELETE("/story/:id", handler.RemoveStory)
 
@@ -42,6 +43,7 @@ func main() {
 	auth.GET("/task/:id", handler.GetTaskById)
 	auth.POST("/tasks", handler.CreateTask)
 	auth.PUT("/task/:id", handler.UpdateTask)
+	auth.PATCH("/task/:id/status", handler.UpdateTaskStatus)
 
 	//Timers
 	auth.PUT("/task/:id/start", handler.StarTimerHandler)

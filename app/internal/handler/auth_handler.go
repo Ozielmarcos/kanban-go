@@ -63,7 +63,7 @@ func RefreshTokenHandler(c *gin.Context) {
 	}
 
 	token, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (interface{}, error) {
-		return []byte(os.Getenv("JWT_SECRET")), nil
+		return []byte(os.Getenv("REFRESH_SECRET")), nil
 	})
 
 	if err != nil || !token.Valid {

@@ -2,14 +2,14 @@ package model
 
 import "time"
 
-type taskStatus string
+type TaskStatus string
 
 const (
-	ToDo       taskStatus = "to_do"
-	InProgress taskStatus = "in_progress"
-	Done       taskStatus = "done"
-	Review     taskStatus = "review"
-	Blocked    taskStatus = "blocked"
+	ToDo       TaskStatus = "to_do"
+	InProgress TaskStatus = "in_progress"
+	Done       TaskStatus = "done"
+	Review     TaskStatus = "review"
+	Blocked    TaskStatus = "blocked"
 )
 
 type taskPriority string
@@ -34,7 +34,7 @@ type Task struct {
 	Title             string       `json:"title"`
 	Description       string       `json:"description"`
 	Effort            float32      `json:"effort"`
-	Status            taskStatus   `json:"status"`
+	Status            TaskStatus   `json:"status"`
 	Priority          taskPriority `json:"priority"`
 	CreatedAt         time.Time    `json:"created_at"` // ISO string
 	TimeEntries       []TimeEntry  `json:"time_entries,omitempty"`

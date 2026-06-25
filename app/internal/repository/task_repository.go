@@ -88,6 +88,14 @@ func UpdateTask(id string, task model.Task) error {
 	return nil
 }
 
+func UpdateTaskStatus(id string, status model.TaskStatus) error {
+	sql := "UPDATE tasks SET status=$1 WHERE id=$2"
+
+	_, err := database.DB.Exec(sql, status, id)
+
+	return err
+}
+
 func StarTimer(taskId string) error {
 	sql := "UPDATE tasks SET is_timer_running = true, current_timer_start = NOW() where id = $1"
 

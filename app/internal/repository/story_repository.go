@@ -75,3 +75,48 @@ func RemoveStory(id string, userId string) error {
 	}
 	return nil
 }
+
+func GetStoriesTask(storyId string) ([]model.Task, error) {
+	sql := `SELECT id,
+				story_id,
+				title,
+				description,
+				effort,
+				status, 
+				priority,
+				created_at,
+				is_timer_running,
+				current_timer_start 
+			FROM tasks WHERE story_id = $1`
+
+	rows, err := database.DB.Query(sql, storyId)
+
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	tasks := []model.Task{}
+
+	for rows.Next() {
+		var task model.Task
+		err := rows.Scan(
+			&task.ID,
+			&task.StoryId,
+			&task.Title,
+			&task.Description,
+			&task.Effort,
+			&task.Status,
+			&task.Priority,
+			&task.CreatedAt,
+			&task.IsTimerRunning,
+			&task.CurrentTimerStart,
+		)
+
+		if err != nil {
+			continue
+		}
+		tasks = append(tasks, task)
+	}
+	return tasks, nil
+}

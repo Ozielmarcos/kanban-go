@@ -42,6 +42,17 @@ func GetStoriesByUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, stories)
 }
 
+func GetTasksByStory(c *gin.Context) {
+	storyId := c.Param("story_id")
+
+	tasks, err := repository.GetStoriesTask(storyId)
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": "Não foram encontradas tarefas vinculadas à esse projeto!"})
+		return
+	}
+	c.IndentedJSON(http.StatusOK, tasks)
+}
+
 func UpdateStory(c *gin.Context) {
 	var story model.Story
 	c.BindJSON(&story)

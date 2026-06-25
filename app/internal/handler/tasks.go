@@ -102,6 +102,28 @@ func UpdateTask(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "Tarefa atualizada com sucesso!"})
 }
 
+func UpdateTaskStatus(c *gin.Context) {
+	var body struct {
+		Status model.TaskStatus `json:"status"`
+	}
+
+	if err := c.BindJSON(&body); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Payload inválido!"})
+		return
+	}
+
+	id := c.Param("id")
+
+	err := repository.UpdateTaskStatus(id, body.Status)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusInternalServerError, gin.H{"message": "Erro ao atualizar a tarefa!", "erro": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Status atualizado com sucesso."})
+}
+
 func StarTimerHandler(c *gin.Context) {
 	id := c.Param("id")
 
