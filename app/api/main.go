@@ -50,5 +50,10 @@ func main() {
 	auth.PUT("/task/:id/pause", handler.PauseTimerHandler)
 	auth.PUT("/task/:id/resume", handler.ResumeTimerHandler)
 
+	//Apontamentos
+	auth.GET("/stories/:story_id/entries", handler.GetTimeEntriesByStoryHandler)
+	auth.PATCH("/time-entry/:id", handler.UpdateEntryHandler)
+	auth.DELETE("/time-entry/:id", handler.DeleteEntryHandler)
+
 	r.Run(":3005")
 }

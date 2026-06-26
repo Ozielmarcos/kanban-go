@@ -32,7 +32,7 @@ func GenerateToken(user model.User) (string, error) {
 }
 
 func GenerateRefreshToken(user model.User) (string, error) {
-	var secret = []byte(os.Getenv("JWT_SECRET"))
+	var secret = []byte(os.Getenv("REFRESH_SECRET"))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,

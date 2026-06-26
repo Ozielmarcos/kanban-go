@@ -80,7 +80,7 @@ func RefreshTokenHandler(c *gin.Context) {
 	userId := fmt.Sprintf("%v", claims["user_id"])
 
 	user := model.User{ID: userId}
-	newAccessToken, _ := service.GenerateRefreshToken(user)
+	newAccessToken, _ := service.GenerateToken(user)
 
 	c.JSON(http.StatusOK, gin.H{"token": newAccessToken})
 }

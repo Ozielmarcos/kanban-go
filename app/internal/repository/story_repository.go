@@ -77,17 +77,27 @@ func RemoveStory(id string, userId string) error {
 }
 
 func GetStoriesTask(storyId string) ([]model.Task, error) {
-	sql := `SELECT id,
-				story_id,
-				title,
-				description,
-				effort,
-				status, 
-				priority,
-				created_at,
-				is_timer_running,
-				current_timer_start 
-			FROM tasks WHERE story_id = $1`
+	sql := `SELECT
+				t.*,
+				COALESCE(
+					SUM(
+						EXTRACT(EPOCH FROM (te.end_time - te.start_time))
+					),
+					0
+				)
+				+
+				CASE
+					WHEN t.is_timer_running = true
+						AND t.current_timer_start IS NOT NULL
+					THEN EXTRACT(EPOCH FROM (NOW() - t.current_timer_start))
+					ELSE 0
+				END
+				AS spent_hours
+			FROM tasks t
+			LEFT JOIN time_entries te
+				ON te.task_id = t.id
+			WHERE t.story_id = $1
+			GROUP BY t.id;`
 
 	rows, err := database.DB.Query(sql, storyId)
 
@@ -111,6 +121,7 @@ func GetStoriesTask(storyId string) ([]model.Task, error) {
 			&task.CreatedAt,
 			&task.IsTimerRunning,
 			&task.CurrentTimerStart,
+			&task.SpentHours,
 		)
 
 		if err != nil {

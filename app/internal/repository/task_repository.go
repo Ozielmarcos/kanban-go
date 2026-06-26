@@ -17,7 +17,30 @@ func GetTasks() []model.Task {
 }
 
 func GetTasksByUser(storyId string) ([]model.Task, error) {
-	rows, err := database.DB.Query("SELECT * FROM tasks WHERE story_id = $1", storyId)
+	sql := `SELECT
+				t.*,
+				COALESCE(
+					SUM(
+						EXTRACT(EPOCH FROM (te.end_time - te.start_time))
+					),
+					0
+				)
+				+
+				CASE
+					WHEN t.is_timer_running = true
+						AND t.current_timer_start IS NOT NULL
+					THEN EXTRACT(EPOCH FROM (NOW() - t.current_timer_start))
+					ELSE 0
+				END
+				AS spent_hours
+			FROM tasks t
+			LEFT JOIN time_entries te
+				ON te.task_id = t.id
+			WHERE t.story_id = $1
+			GROUP BY t.id;`
+
+	rows, err := database.DB.Query(sql, storyId)
+
 	if err != nil {
 		return nil, err
 	}
@@ -26,7 +49,19 @@ func GetTasksByUser(storyId string) ([]model.Task, error) {
 	var tasks []model.Task
 	for rows.Next() {
 		var task model.Task
-		err := rows.Scan(&task.ID, &task.StoryId, &task.Title, &task.Description, &task.Effort, &task.Status, &task.Priority, &task.CreatedAt, &task.IsTimerRunning, &task.CurrentTimerStart)
+		err := rows.Scan(
+			&task.ID,
+			&task.StoryId,
+			&task.Title,
+			&task.Description,
+			&task.Effort,
+			&task.Status,
+			&task.Priority,
+			&task.CreatedAt,
+			&task.IsTimerRunning,
+			&task.CurrentTimerStart,
+			&task.SpentHours,
+		)
 		if err != nil {
 			continue
 		}
@@ -42,7 +77,18 @@ func GetTaskById(id string, storyId string) (model.Task, error) {
 	err := database.DB.QueryRow(
 		"SELECT * FROM tasks WHERE id = $1 AND story_id = $2",
 		id, storyId,
-	).Scan(&task.ID, &task.StoryId, &task.Title, &task.Description, &task.Effort, &task.Status, &task.Priority, &task.CreatedAt, &task.IsTimerRunning, &task.CurrentTimerStart)
+	).Scan(
+		&task.ID,
+		&task.StoryId,
+		&task.Title,
+		&task.Description,
+		&task.Effort,
+		&task.Status,
+		&task.Priority,
+		&task.CreatedAt,
+		&task.IsTimerRunning,
+		&task.CurrentTimerStart,
+	)
 
 	return task, err
 }
